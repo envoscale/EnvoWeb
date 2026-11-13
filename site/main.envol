@@ -1,14 +1,15 @@
-// The EnvoScale website (website/PLAN.md, phase 1; PLAN D52), written in Envol. The home
-// page uses Envor's Landing template; every Markdown document of the repository uses
-// the Docs template. Pages keep the repository's paths (docs/spec/eir.md becomes
-// docs/spec/eir.html), so the documents' links to each other work, and every link is
-// relative, so the site works under any address.
+// The EnvoScale website, written in EnvoL. The home page uses EnvoR's Landing template;
+// every Markdown document of the EnvoScale documentation uses the Docs template. Pages
+// keep the documents' paths (envol/README.md becomes envol/README.html), so their links
+// to each other work, and every link is relative, so the site works under any address.
 //
-//   envo build website/site.envol -o build/site-tool    (or envoc build --lib .)
-//   build/site-tool build [folder]    static files into folder (default build/site)
-//   build/site-tool serve [port]      the same pages, rendered per request (default 8080)
+//   envo build site                   build/site
+//   site build [folder]               static files into folder (default build/site)
+//   site serve [port]                 the same pages, rendered per request (default 8080)
 //
-// Run it from the repository's root. Static generation and serving are one code path:
+// Run it from an EnvoScale (documentation) checkout. The sandbox page needs EnvoLang's
+// JavaScript host and its compiler built for WebAssembly: set ENVOLANG to an EnvoLang
+// checkout to include it. Static generation and serving are one code path:
 // a page is a function from a request to a response (envoweb).
 use envoweb as web;
 use envoweb.templates;
@@ -21,12 +22,12 @@ use alloc.text;
 
 const str SITE = "EnvoScale";
 
-// The EnvoScale mark (docs/images/logo.svg): an E whose bars widen toward its base.
+// The EnvoScale mark: an E whose bars widen toward its base.
 const str LOGO_SVG = "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 512 512\" width=\"512\" height=\"512\"><title>EnvoScale</title><rect width=\"512\" height=\"512\" rx=\"112\" fill=\"#0a64d4\"/><g fill=\"#ffffff\"><rect x=\"112\" y=\"120\" width=\"56\" height=\"272\" rx=\"12\"/><rect x=\"112\" y=\"120\" width=\"176\" height=\"56\" rx=\"12\"/><rect x=\"112\" y=\"228\" width=\"232\" height=\"56\" rx=\"12\"/><rect x=\"112\" y=\"336\" width=\"288\" height=\"56\" rx=\"12\"/></g></svg>\n";
 
 // ------------------------------------------------------------------ the pages
 
-// The Markdown files the site publishes, as repository paths ("docs/spec/eir.md").
+// The Markdown files the site publishes, as paths in the checkout ("envol/README.md").
 List<string> Sources() {
     List<string> all = List<string>.New();
     List<string> dirs = List<string>.New();
@@ -57,7 +58,7 @@ List<string> Sources() {
     return all;
 }
 
-// The site path of a repository Markdown file: "/docs/spec/eir.html".
+// The site path of a Markdown file: "/envol/README.html".
 string PageOf(str source) {
     string s = string.From("/");
     s.Append(source[0..source.Len - 3]);
@@ -134,60 +135,33 @@ void Group(ref List<templates.NavItem> nav, str from, str title, str dir) {
 }
 
 // The library modules that have landed, by their READMEs' status line.
-void Library(ref List<templates.NavItem> nav, str from) {
-    nav.Push(templates.NavItem.Heading("Library"));
-    Add(ref nav, from, "Overview", "lib/README.md", 0);
-    List<str> roots = List<str>.New();
-    roots.Push("lib");
-    roots.Push("lib/envo");
-    str[] rs = roots.AsSlice();
-    for (usize k = 0; k < rs.Len; k++) {
-        var r = fs.ListDir(rs[k]);
-        if (r.IsErr()) continue;
-        List<string> names = r.Unwrap();
-        string[] ns = names.AsSlice();
-        for (usize i = 0; i < ns.Len; i++) {
-            string readme = string.From(rs[k]);
-            readme.AppendByte('/');
-            readme.Append(ns[i].AsStr());
-            readme.Append("/README.md");
-            if (!fs.IsFile(readme.AsStr()) || IsText(ns[i].AsStr(), "envo")) continue;
-            var text0 = fs.ReadText(readme.AsStr());
-            if (text0.IsErr()) continue;
-            string t = text0.Unwrap();
-            if (HasText(t.AsStr(), "Not started")) continue;
-            string label = string.New();
-            if (IsText(rs[k], "lib/envo")) label.Append("envo.");
-            label.Append(ns[i].AsStr());
-            Add(ref nav, from, label.AsStr(), readme.AsStr(), 1);
-        }
-    }
-}
-
 // The side navigation, its links relative to the page at from.
 List<templates.NavItem> Nav(str from) {
     List<templates.NavItem> nav = List<templates.NavItem>.New();
     nav.Push(templates.NavItem.Heading("Start"));
     Add(ref nav, from, "Overview", "README.md", 0);
-    Add(ref nav, from, "Status", "docs/status.md", 0);
-    Add(ref nav, from, "Plan", "docs/PLAN.md", 0);
-    Add(ref nav, from, "Principles", "docs/principles.md", 0);
-    Add(ref nav, from, "Documentation", "docs/README.md", 0);
-    Add(ref nav, from, "Guides", "docs/guides/README.md", 0);
-    Group(ref nav, from, "Language", "docs/spec");
-    Group(ref nav, from, "Architecture", "docs/architecture");
-    Library(ref nav, from);
-    nav.Push(templates.NavItem.Heading("Design"));
-    Add(ref nav, from, "Envor", "docs/lumen/README.md", 0);
-    Add(ref nav, from, "Porting", "docs/porting/README.md", 0);
+    Add(ref nav, from, "Getting started", "getting-started.md", 0);
+    Add(ref nav, from, "A tour of EnvoL", "envol/README.md", 0);
+    nav.Push(templates.NavItem.Heading("Projects"));
+    Add(ref nav, from, "EnvoPM", "envopm/README.md", 0);
+    Add(ref nav, from, "EnvoR", "envor/README.md", 0);
+    Add(ref nav, from, "EnvoUI", "envoui/README.md", 0);
+    Add(ref nav, from, "EnvIDE", "envide/README.md", 0);
+    Add(ref nav, from, "EnvoWeb", "envoweb/README.md", 0);
+    Add(ref nav, from, "EnvOS", "envos/README.md", 0);
+    Group(ref nav, from, "How it is built", "architecture");
+    Add(ref nav, from, "Bootstrap", "bootstrap/bootstrap.md", 0);
+    Add(ref nav, from, "Porting", "porting/README.md", 0);
     nav.Push(templates.NavItem.Heading("Project"));
-    Add(ref nav, from, "Contributing", "CONTRIBUTING.md", 0);
-    Add(ref nav, from, "RFCs", "docs/rfcs/README.md", 0);
-    Add(ref nav, from, "Security", ".github/SECURITY.md", 0);
-    Add(ref nav, from, "Enterprise", "docs/guides/enterprise.md", 0);
-    Add(ref nav, from, "Licensing", "docs/legal/licensing.md", 0);
-    Add(ref nav, from, "Trademarks", "docs/legal/trademarks.md", 0);
-    Add(ref nav, from, "Code of conduct", ".github/CODE_OF_CONDUCT.md", 0);
+    Add(ref nav, from, "Status", "project/status.md", 0);
+    Add(ref nav, from, "Plan", "project/plan.md", 0);
+    Add(ref nav, from, "Principles", "project/principles.md", 0);
+    Add(ref nav, from, "RFCs", "rfcs/README.md", 0);
+    nav.Push(templates.NavItem.Heading("Organizations"));
+    Add(ref nav, from, "Enterprise", "guides/enterprise.md", 0);
+    Add(ref nav, from, "Offline install", "guides/offline-install.md", 0);
+    Add(ref nav, from, "Licensing", "legal/licensing.md", 0);
+    Add(ref nav, from, "Trademarks", "legal/trademarks.md", 0);
     return nav;
 }
 
@@ -197,32 +171,32 @@ templates.Frame FrameFor(str page) {
     templates.Frame f = templates.Frame.New(SITE, home.AsStr(), css.AsStr());
     string logo = Rel(page, "/logo.svg");
     f.Logo = logo;
-    f.Top.Push(templates.NavItem.Link("Docs", Rel(page, "/docs/README.html").AsStr(), 0));
-    f.Top.Push(templates.NavItem.Link("Learn", Rel(page, "/docs/guides/README.html").AsStr(), 0));
-    f.Top.Push(templates.NavItem.Link("Language", Rel(page, "/docs/spec/README.html").AsStr(), 0));
-    f.Top.Push(templates.NavItem.Link("Sandbox", Rel(page, "/sandbox/").AsStr(), 0));
-    f.Top.Push(templates.NavItem.Link("Status", Rel(page, "/docs/status.html").AsStr(), 0));
-    f.Footer = string.From("EnvoScale. This site is built by an Envol program (website/site.envol) with envoweb and Envor.");
+    f.Top.Push(templates.NavItem.Link("Docs", Rel(page, "/README.html").AsStr(), 0));
+    f.Top.Push(templates.NavItem.Link("Get started", Rel(page, "/getting-started.html").AsStr(), 0));
+    f.Top.Push(templates.NavItem.Link("Language", Rel(page, "/envol/README.html").AsStr(), 0));
+    if (HasSandbox()) f.Top.Push(templates.NavItem.Link("Sandbox", Rel(page, "/sandbox/").AsStr(), 0));
+    f.Top.Push(templates.NavItem.Link("Status", Rel(page, "/project/status.html").AsStr(), 0));
+    f.Footer = string.From("EnvoScale. This site is an EnvoL program, built with EnvoWeb and EnvoR.");
     return f;
 }
 
 http.Response Home() {
     templates.Frame f = FrameFor("/");
-    templates.Landing l = templates.Landing.New("One language for everything you build.", "Envol is a programming language, and EnvoScale is everything around it in one place: the compiler, the standard library and the envo tool. Command-line programs, servers, desktop and terminal apps, websites, graphics and AI, with no third-party code anywhere.");
-    l.PrimaryText = string.From("Read the docs");
-    l.PrimaryHref = string.From("docs/README.html");
+    templates.Landing l = templates.Landing.New("One language for everything you build.", "EnvoL is a programming language, and EnvoScale is everything around it in one place: the compiler, the standard library and the envo tool. Command-line programs, servers, desktop and terminal apps, websites, graphics and AI, with no third-party code anywhere.");
+    l.PrimaryText = string.From("Get started");
+    l.PrimaryHref = string.From("getting-started.html");
     l.SecondaryText = string.From("See where it stands");
-    l.SecondaryHref = string.From("docs/status.html");
-    l.Features.Push(templates.Feature.Of("One language", "Envol reads like C# and compiles to native code: scripts, apps, servers and low-level code in one language, from a one-line program up.", "docs/spec/README.html"));
+    l.SecondaryHref = string.From("project/status.html");
+    l.Features.Push(templates.Feature.Of("One language", "EnvoL compiles to native code: scripts, apps, servers and low-level code in one language, from a one-line program up.", "envol/README.html"));
     l.Features.Push(templates.Feature.Of("Built from the ground up", "A few kilobytes of readable assembly build the compiler that EnvoScale starts from, and the compiler rebuilds itself to the same bytes on every OS. Every step is checked in CI.", "https://github.com/envoscale/EnvoScaleAsm"));
-    l.Features.Push(templates.Feature.Of("Every platform is an adapter", "Programs talk to ports; Windows, Linux and WebAssembly are adapters behind them, and each passes the same conformance suites.", "docs/architecture/ports-and-adapters.html"));
-    l.Features.Push(templates.Feature.Of("Batteries, not dependencies", "Crypto and TLS, HTTP, terminal and desktop UI, fonts, 2D and GPU drawing, all in the standard platform, all written in Envol.", "lib/README.html"));
+    l.Features.Push(templates.Feature.Of("Every platform is an adapter", "Programs talk to ports; Windows, Linux and WebAssembly are adapters behind them, and each passes the same conformance suites.", "architecture/ports-and-adapters.html"));
+    l.Features.Push(templates.Feature.Of("Batteries, not dependencies", "Crypto and TLS, HTTP, terminal and desktop UI, fonts, 2D and GPU drawing, all in the standard platform, all written in EnvoL.", "envol/README.html"));
     markdown.Doc body = markdown.Render(HOME_BODY, markdown.Options.Site());
     l.Body = string.From(body.HtmlOf());
     return http.Response.Html(200, templates.LandingPage(f, l).AsStr());
 }
 
-const str HOME_BODY = "## Hello, World\n\n```envo\nprint(\"Hello, World!\");\n```\n\nOne line is a whole program, and the same language takes you to servers, windows and websites: the [README](README.html) has more.\n\n## Try it\n\nDownload a release from [GitHub](https://github.com/envoscale/EnvoScale/releases), or build from source with only what your OS ships: `./build.sh build` on Linux and Git Bash, `.\\build.ps1 build` on Windows. The [status page](docs/status.html) says what works today.\n";
+const str HOME_BODY = "## Hello, World\n\n```envo\nprint(\"Hello, World!\");\n```\n\nOne line is a whole program, and the same language takes you to servers, windows and websites: the [tour](envol/README.html) shows more.\n\n## Try it\n\nDownload a release from [GitHub](https://github.com/envoscale/EnvoLang/releases), or build from source with only what your OS ships: `./build.sh build` on Linux and Git Bash, `.\\build.ps1 build` on Windows. The [status page](project/status.html) says what works today.\n";
 
 http.Response DocPage(str page, str source) {
     var r = fs.ReadText(source);
@@ -239,10 +213,10 @@ http.Response DocPage(str page, str source) {
 }
 
 // The sandbox: the compiler, built for WebAssembly (build/envoc.wasm), compiles and runs
-// programs in the page (website/PLAN.md, phase 3b).
+// programs in the page (the website plan, phase 3b).
 http.Response Sandbox() {
     templates.Frame f = FrameFor("/sandbox/index.html");
-    templates.Landing l = templates.Landing.New("Sandbox", "Envol in your browser: the compiler itself, built for WebAssembly, compiles your program on this page and runs it there. Nothing you type leaves your machine.");
+    templates.Landing l = templates.Landing.New("Sandbox", "EnvoL in your browser: the compiler itself, built for WebAssembly, compiles your program on this page and runs it there. Nothing you type leaves your machine.");
     l.Body = string.From(SANDBOX_BODY);
     return http.Response.Html(200, templates.LandingPage(f, l).AsStr());
 }
@@ -250,6 +224,20 @@ http.Response Sandbox() {
 const str SANDBOX_BODY = "<div class=\"sandbox\">\n<div class=\"toolbar\">\n<label for=\"example\">Example</label>\n<select id=\"example\">\n<option value=\"hello\">Hello, World</option>\n<option value=\"fizzbuzz\">FizzBuzz</option>\n<option value=\"structs\">Structs and methods</option>\n<option value=\"generics\">Generics</option>\n<option value=\"panic\">A panic</option>\n</select>\n<button id=\"run\" class=\"button primary\" type=\"button\" disabled>Run</button>\n<button id=\"share\" class=\"button\" type=\"button\">Share</button>\n</div>\n<label for=\"code\" class=\"visually-hidden\">Program</label>\n<textarea id=\"code\" class=\"code\" spellcheck=\"false\" autocapitalize=\"off\" autocomplete=\"off\"></textarea>\n<h2>Output</h2>\n<pre id=\"out\" class=\"output\" aria-live=\"polite\">Loading the compiler…</pre>\n<p>The sandbox has the language and its prelude (List, string, Option, Result). The standard platform (std, envo.*) is not in the page yet.</p>\n</div>\n<script src=\"envo.js\"></script>\n<script src=\"sandbox.js\"></script>\n";
 
 // A file of the repository as a response of type type, or 404.
+// path inside the EnvoLang checkout named by ENVOLANG.
+string InLang(str path) {
+    string root = env.Var("ENVOLANG") ?? string.From(".");
+    root.AppendByte('/');
+    root.Append(path);
+    return root;
+}
+
+// Does ENVOLANG name an EnvoLang checkout with the compiler built for WebAssembly?
+bool HasSandbox() {
+    string wasm = InLang("build/envoc.wasm");
+    return env.Var("ENVOLANG").IsSome() && fs.IsFile(wasm.AsStr());
+}
+
 http.Response FileOf(str source, str type) {
     var r = fs.ReadText(source);
     if (r.IsErr()) return http.Response.Html(404, "<!doctype html>\n<title>Not found</title>\n<h1>Not found</h1>\n");
@@ -264,9 +252,9 @@ http.Response SitePage(in http.Request req, in web.Params ps) {
     str path = ps.Get("path");
     if (path.Len == 0 || IsText(path, "index.html")) return Home();
     if (IsText(path, "sandbox") || IsText(path, "sandbox/") || IsText(path, "sandbox/index.html")) return Sandbox();
-    if (IsText(path, "sandbox/envo.js")) return FileOf("adapters/interop/js/envo.js", "text/javascript; charset=utf-8");
-    if (IsText(path, "sandbox/sandbox.js")) return FileOf("adapters/interop/js/sandbox.js", "text/javascript; charset=utf-8");
-    if (IsText(path, "sandbox/envoc.wasm")) return FileOf("build/envoc.wasm", "application/wasm");
+    if (IsText(path, "sandbox/envo.js")) return FileOf(InLang("adapters/interop/js/envo.js").AsStr(), "text/javascript; charset=utf-8");
+    if (IsText(path, "sandbox/sandbox.js")) return FileOf(InLang("adapters/interop/js/sandbox.js").AsStr(), "text/javascript; charset=utf-8");
+    if (IsText(path, "sandbox/envoc.wasm")) return FileOf(InLang("build/envoc.wasm").AsStr(), "application/wasm");
     if (IsText(path, "logo.svg")) {
         http.Response svg = http.Response.Text(200, LOGO_SVG);
         svg.SetHeader("Content-Type", "image/svg+xml");
@@ -311,10 +299,12 @@ if (IsText(command, "serve")) {
     pages.Push(string.From("/"));
     pages.Push(string.From("/theme.css"));
     pages.Push(string.From("/logo.svg"));
-    pages.Push(string.From("/sandbox/"));
-    pages.Push(string.From("/sandbox/envo.js"));
-    pages.Push(string.From("/sandbox/sandbox.js"));
-    if (fs.IsFile("build/envoc.wasm")) pages.Push(string.From("/sandbox/envoc.wasm"));
+    if (HasSandbox()) {
+        pages.Push(string.From("/sandbox/"));
+        pages.Push(string.From("/sandbox/envo.js"));
+        pages.Push(string.From("/sandbox/sandbox.js"));
+        pages.Push(string.From("/sandbox/envoc.wasm"));
+    }
     string[] ss = sources.AsSlice();
     for (usize i = 0; i < ss.Len; i++) pages.Push(PageOf(ss[i].AsStr()));
     List<str> paths = List<str>.New();

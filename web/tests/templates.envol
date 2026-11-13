@@ -1,4 +1,4 @@
-// envoweb.templates: Envor's CSS from the tokens (both schemes), and the Docs and
+// envoweb.templates: EnvoR's CSS from the tokens (both schemes), and the Docs and
 // Landing pages' structure: the skip link, landmarks, the current page, the page's
 // contents, and escaping of every text.
 // expect: css: light accent yes, dark accent yes, focus ring yes, reduced motion yes

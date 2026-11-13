@@ -4,7 +4,7 @@
 
 Websites (PLAN D50, D51), on `envo.http`. A page is a function from a request (and its
 route's parameters) to a response. The same pages are rendered per request by the server
-(SSR) or once per path into files (SSG, `Build`), so a site has one code path. Envor
+(SSR) or once per path into files (SSG, `Build`), so a site has one code path. EnvoR
 supplies the look through `envoweb.templates`.
 
 ## Simple door
@@ -31,7 +31,7 @@ web.Serve(ref app, "127.0.0.1", 8080);
 - `Serve`, `ServeOneWith(ref net, ref files, ref app, listener)`.
 - `Build(ref files, app, paths, folder)` writes each path's page (`/` becomes
   `index.html`) and copies the static folders.
-- `envoweb.templates`: `Css(light, dark)` from Envor's tokens, and `Frame` and `NavItem`
+- `envoweb.templates`: `Css(light, dark)` from EnvoR's tokens, and `Frame` and `NavItem`
   for the pages. `Docs(frame, title, description, nav, current, doc)` lays out side
   navigation, content and the page's contents. `LandingPage(frame, landing)` lays out a
   hero, actions, feature cards and more content. Pages have a skip link, landmarks,

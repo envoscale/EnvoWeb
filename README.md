@@ -1,10 +1,10 @@
-<img src="https://raw.githubusercontent.com/envoscale/EnvoScale/main/docs/images/logo.svg" alt="" width="56" align="left">
+<img src="https://raw.githubusercontent.com/envoscale/.github/main/profile/assets/logo.svg" alt="" width="56" align="left">
 
-# EnvoScaleWeb
+# EnvoWeb
 
-Websites in [Envol](https://github.com/envoscale/EnvoScale): `envoweb` (routes, pages, a
+Websites in [EnvoL](https://github.com/envoscale/EnvoLang): `envoweb` (routes, pages, a
 server, and static builds from the same code), `envoweb.markdown`, and page templates drawn
-with Envor's theme. [`site/`](site) is EnvoScale's own website, built with them.
+with EnvoR's theme. [`site/`](site) is the EnvoScale website, built with them.
 
 ```cs
 use envoweb as web;
@@ -19,18 +19,22 @@ web.Serve(ref app, "127.0.0.1", 8080);
 
 ## The website
 
-From an EnvoScale checkout (the site renders its docs):
+The site is the [EnvoScale documentation](https://github.com/envoscale/EnvoScale), rendered.
+From a checkout of it:
 
 ```bash
-envo build path/to/EnvoScaleWeb/site
-path/to/EnvoScaleWeb/site/build/site build      # the static site in build/site
+envo build path/to/EnvoWeb/site
+path/to/EnvoWeb/site/build/site build      # the static site in build/site
 ```
+
+Set `ENVOLANG` to an EnvoLang checkout with `build/envoc.wasm` to include the sandbox,
+where the compiler runs in the browser.
 
 ## Use
 
 ```
 dependencies {
-    envoweb = { git = "https://github.com/envoscale/EnvoScaleWeb", rev = "<commit>" }
+    envoweb = { git = "https://github.com/envoscale/EnvoWeb", rev = "<commit>" }
 }
 ```
 
