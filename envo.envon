@@ -1,5 +1,5 @@
 #eon 1
-// envoweb: websites in Envol: routes, pages, static builds, Markdown, and page templates.
+// envoweb: websites in EnvoL: routes, pages, static builds, Markdown, and page templates.
 package {
     name    = "envoweb"
     version = "0.1.0"
