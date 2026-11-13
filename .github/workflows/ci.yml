@@ -27,10 +27,10 @@ jobs:
           cd envoscale && ./build.sh build
       - run: |
           e=envoscale/build/envo/envo
-          if [ -f "$e.exe" ]; then e="$e.exe"; fi
+          if [ "$RUNNER_OS" = Windows ]; then e="$e.exe"; fi
           "$e" test
       - run: |
           e=envoscale/build/envo/envo
-          if [ -f "$e.exe" ]; then e="$e.exe"; fi
+          if [ "$RUNNER_OS" = Windows ]; then e="$e.exe"; fi
           "$e" build site
-          cd envoscale && s=../site/build/site; if [ -f "$s.exe" ]; then s="$s.exe"; fi; "$s" build build/site && test -f build/site/index.html
+          cd envoscale && s=../site/build/site; if [ "$RUNNER_OS" = Windows ]; then s="$s.exe"; fi; "$s" build build/site && test -f build/site/index.html
