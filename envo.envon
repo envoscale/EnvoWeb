@@ -6,5 +6,5 @@ package {
     edition = "2027"
 }
 dependencies {
-    envor = { git = "https://github.com/envoscale/Envor", rev = "596ea4c3fbd47bb2a3967780b9da33544a4e9dd5" }
+    envor = { git = "https://github.com/envoscale/EnvoR", rev = "14884253964dbef4d517e33990eb04e5658dc9d7" }
 }
